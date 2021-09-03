@@ -1,0 +1,8 @@
+{
+    "name": "eslint-plugin-template-processor",
+    "version": "0.0.1",
+    "description": "",
+    "main": "index.js",
+    "license": "MIT",
+    "author": "Anton Khabibulin <anton8964@gmail.com>"
+}
