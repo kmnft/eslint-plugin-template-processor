@@ -1,15 +1,12 @@
 const templateRegex = /template:\s*(?:`)((?:\n|[^`])*)(?:`)(?:}|,)/gm
 
-const generateMapToFile = (text) => {
-  const lines = text.split('\n')
-  return {
-    input: text,
-    chars: text.length,
-    lines: lines.length,
-    blocks: [],
-    ranges: []
-  }
-}
+const generateMapToFile = (text) => ({
+  input: text,
+  chars: text.length,
+  lines: text.split('\n').length,
+  blocks: [],
+  ranges: []
+})
 
 const mapBlockLineToFileLine = (blockLine, textLine, text) => {
   return text.substring(0, textLine).split('\n').length + blockLine - 1
@@ -20,7 +17,6 @@ module.exports = {
   processors: {
     "template-processor": {
       preprocess(text, filename) {
-        console.log(filename)
         if (!map[filename]) {
           map[filename] = generateMapToFile(text)
         }
@@ -41,21 +37,18 @@ module.exports = {
         return map[filename].blocks;
       },
       postprocess(messages, filename) {
-        // for (let index = 0; index != messages.length; index++) {
-          // for (const block of messages[index]) {
-          // }
-        // }
-        // const blocks = [].concat(...messages)
-        // for (let index = 0; index != blocks.length; index++) {
-        //   // blocks[index].column =
-        //   //   blocks[index].column > 1 ? blocks[index].column - 1 : 1
-        //   // blocks[index].line = mapBlockLineToFileLine(
-        //   //   blocks[index].line,
-        //   //   map[filename].ranges[index][0],
-        //   //   map[filename].input,
-        //   // )
-        // }
-        // return blocks
+        for (let blockIdx = 0; blockIdx != messages.length; blockIdx++) {
+          for (let messageIdx = 0; messageIdx != messages[blockIdx].length; messageIdx++) {
+            messages[blockIdx][messageIdx].column = messages[blockIdx][messageIdx].column > 1
+              ? messages[blockIdx][messageIdx].column - 1
+              : 1
+            messages[blockIdx][messageIdx].line = mapBlockLineToFileLine(
+              messages[blockIdx][messageIdx].line,
+              map[filename].ranges[blockIdx][0],
+              map[filename].input,
+            )
+          }
+        }
         return [].concat(...messages)
       },
     },
