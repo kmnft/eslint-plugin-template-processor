@@ -4,5 +4,8 @@
     "description": "",
     "main": "index.js",
     "license": "MIT",
-    "author": "Anton Khabibulin <anton8964@gmail.com>"
+    "author": "Anton Khabibulin <anton8964@gmail.com>",
+    "dependencies": {
+        "dedent": "^0.7.0"
+    }
 }
