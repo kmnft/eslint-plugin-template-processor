@@ -1,3 +1,6 @@
 .vscode
 node_modules
 yarn*.log
+docker-compose.yml
+lib/*
+!lib/.gitkeep
