@@ -1,5 +1,5 @@
-import { indentationRegex } from "./regex.js"
-import { textToLines, countEmptyLinesBeforeText } from "./utils.js"
+import { indentationRegex } from "./regex"
+import { textToLines, countEmptyLinesBeforeText } from "./utils"
 
 export function dedent(input, options = { trimLeading: false, trimTrailing: false }) {
   let textByLines = textToLines(input)

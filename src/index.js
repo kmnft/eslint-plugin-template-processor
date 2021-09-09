@@ -1,5 +1,5 @@
-import { processors } from "./processors.js"
-import { configs } from "./configs.js"
+import processors from "./processors"
+import configs from "./configs"
 
 export {
   processors,

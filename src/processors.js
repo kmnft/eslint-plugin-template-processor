@@ -1,49 +1,38 @@
-import { textToLines, adjustLine, adjustColumn } from './utils.js'
-import { templateRegex, newLineRegex, isBlockRegex } from './regex.js'
-import { dedent } from './dedent.js'
 import { PREFIX, POSTFIX } from './prefix'
+import { adjustLine, adjustColumn, flatArray, getBlockIndexFromFilename } from './utils'
+import { templateRegex, isBlockRegex } from './regex'
+import { dedent } from './dedent'
+import { map, mapBuilder } from './map'
 
-const map = {}
-const mapBuilder = (text) => ({
-  input: text,
-  symbols: text.length,
-  lines: text.split(newLineRegex).length,
-  blocks: [],
-})
-
-// TODO: overall refactor
-// FIXME: vue/comment-directive fix
-// FIXME: prettier fix
-
-export const processors = {
+export default {
   "template-processor": {
     preprocess(text, filename) {
       map[filename] = map[filename] || mapBuilder(text)
 
-      let blockIndex = 1
+      // eslint-disable-next-line
       while (true) {
         let result = templateRegex.exec(text)
         if (result === null) {
           break
         }
 
-        const dedented = dedent(
-          result[1],
-          {
-            trimLeading: true,
-            trimTrailing: true
-          }
-        )
+        const dedented = dedent(result[1], {
+          trimLeading: true,
+          trimTrailing: true
+        })
+
         map[filename].blocks.push({
+          source: text,
           text: PREFIX + dedented.formatted + POSTFIX,
           globalIndention: dedented.globalIndention,
-          leadingWhitespaces: dedented.leadingWhitespaces,
-          trailingWhitespaces: dedented.trailingWhitespaces,
-          blockIndex: blockIndex++,
-          ranges: [
-            result.index,
-            result.index + result[1].length
-          ],
+          whitespaces: {
+            leading: dedented.leadingWhitespaces,
+            trailing: dedented.trailingWhitespaces,
+          },
+          ranges: {
+            start: result.index,
+            end: result.index + result[1].length
+          },
           filename
         })
       }
@@ -57,28 +46,19 @@ export const processors = {
         ? filename.split(isBlockRegex)[0]
         : filename
 
-      const messagesList = []
-      for (const message of [].concat(...messages)) {
+      const messagesList = flatArray(messages)
+      for (const message of messagesList) {
         if (!isBlock) {
           continue
         }
-        const block = map[basename].blocks[filename.match(isBlockRegex)[1] - 1]
-        const linesBeforeBlock = textToLines(map[basename].input, 0, block.ranges[0])
-
-        message.line = adjustLine(
-          linesBeforeBlock.length,
-          message.line + block.leadingWhitespaces
-        )
-        message.column = adjustColumn(message.column + block.globalIndention)
-
-        messagesList.push(message)
+        const block = map[basename].blocks[
+          getBlockIndexFromFilename(filename)
+        ]
+        message.line = adjustLine(block, message)
+        message.column = adjustColumn(block, message)
       }
 
       return messagesList
     },
   },
-}
-
-export default {
-  processors
 }

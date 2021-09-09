@@ -1,5 +1,5 @@
-import { newLineRegex  } from "./regex.js"
-import { PREFIX_SIZE } from "./prefix.js"
+import { PREFIX_SIZE } from "./prefix"
+import { newLineRegex, isBlockRegex  } from "./regex"
 
 export function textToLines (text, substringFrom = 0, substringTo = null){
     const substring = substringTo !== null
@@ -20,12 +20,30 @@ export function countEmptyLinesBeforeText(input) {
   return count
 }
 
-export function adjustLine(baseLine, offsetLine) {
-  return baseLine + offsetLine - PREFIX_SIZE;
+export function adjustLine(block, message) {
+  const startLineSource = textToLines(block.source, 0, block.ranges.start).length
+  return startLineSource +
+         block.whitespaces.leading +
+         message.line -
+         PREFIX_SIZE
 }
 
-export function adjustColumn(column) {
-  return column > 1 ? column - 1 : column
+export function adjustColumn(block, message) {
+  const { globalIndention: indention } = block
+  const { column } = message
+  return (column > 1 ? column - 1 : column) + indention
+}
+
+export function flatArray(array) {
+  return [].concat(...array)
+}
+
+export function getBlockIndexFromFilename(filename) {
+  const index = filename.match(isBlockRegex)
+  if (index !== null) {
+    return index[1] - 1
+  }
+  return undefined
 }
 
 export default {

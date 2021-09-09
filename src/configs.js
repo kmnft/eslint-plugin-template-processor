@@ -1,4 +1,4 @@
-export const configs = {
+export default {
   recommended: {
     extends: [
       'plugin:vue/recommended'
