@@ -3,6 +3,7 @@ import { adjustLine, adjustColumn, flatArray, getBlockIndexFromFilename } from '
 import { templateRegex, isBlockRegex } from './regex'
 import { dedent } from './dedent'
 import { map, mapBuilder } from './map'
+import ignoreMessage from './disabledRules'
 
 export default {
   "template-processor": {
@@ -58,7 +59,7 @@ export default {
         message.column = adjustColumn(block, message)
       }
 
-      return messagesList
+      return messagesList.filter((message) => !ignoreMessage(message))
     },
   },
 }
