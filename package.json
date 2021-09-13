@@ -1,7 +1,7 @@
 {
     "name": "eslint-plugin-template-processor",
-    "version": "0.0.1",
-    "description": "",
+    "version": "1.0.0",
+    "description": "Lint your embedded Vue templates",
     "main": "lib/index.js",
     "license": "MIT",
     "author": "Anton Khabibulin <anton8964@gmail.com>",
