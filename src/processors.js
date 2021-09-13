@@ -1,5 +1,5 @@
 import { PREFIX, POSTFIX } from './prefix'
-import { adjustLine, adjustColumn, flatArray, getBlockIndexFromFilename } from './utils'
+import { adjustLine, adjustColumn, flatArray, getBlockIndexFromFilename, adjustRange } from './utils'
 import { templateRegex, isBlockRegex } from './regex'
 import { dedent } from './dedent'
 import { map, mapBuilder } from './map'
@@ -16,8 +16,10 @@ export default {
         if (result === null) {
           break
         }
+        const nonCaptureGroup = result[1]
+        const templateGroup = result[2]
 
-        const dedented = dedent(result[1], {
+        const dedented = dedent(templateGroup, {
           trimLeading: true,
           trimTrailing: true
         })
@@ -31,8 +33,8 @@ export default {
             trailing: dedented.trailingWhitespaces,
           },
           ranges: {
-            start: result.index,
-            end: result.index + result[1].length
+            start: nonCaptureGroup.length + result.index,
+            end: nonCaptureGroup.length + result.index + templateGroup.length
           },
           filename
         })
@@ -57,9 +59,13 @@ export default {
         ]
         message.line = adjustLine(block, message)
         message.column = adjustColumn(block, message)
+        if (message.fix) {
+          message.fix.range = adjustRange(block, message)
+        }
       }
 
       return messagesList.filter((message) => !ignoreMessage(message))
     },
+    supportsAutofix: true,
   },
 }
