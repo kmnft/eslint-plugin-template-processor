@@ -1,3 +1,7 @@
+# Warning
+
+Development of plugin is still WIP. Feel free to contribute!
+
 # Usage
 
 Add template-processor to plugins list, chose your config and add it to `extends` property:
